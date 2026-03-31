@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, jsonify
 import os, re, uuid, threading, json, concurrent.futures
-from database import connect_db, create_table
+from database import connect_db, create_table, Q
 from video_processing import extract_audio
 from speech_to_text import transcribe_audio
 from audio_processing import extract_audio_features
@@ -58,7 +58,7 @@ def register():
     cur = conn.cursor()
 
     try:
-        cur.execute("INSERT INTO users(username,email,password) VALUES(%s,%s,%s)",
+        cur.execute(f"INSERT INTO users(username,email,password) VALUES({Q},{Q},{Q})",
                     (username, email, password))
         conn.commit()
     except Exception as e:
@@ -77,7 +77,7 @@ def login_user():
     conn = connect_db()
     cur = conn.cursor()
 
-    cur.execute("SELECT username, password FROM users WHERE username=%s", (username,))
+    cur.execute(f"SELECT username, password FROM users WHERE username={Q}", (username,))
     user = cur.fetchone()
 
     conn.close()
@@ -100,7 +100,7 @@ def reset_password():
     conn = connect_db()
     cur = conn.cursor()
 
-    cur.execute("UPDATE users SET password=%s WHERE email=%s", (new_password, email))
+    cur.execute(f"UPDATE users SET password={Q} WHERE email={Q}", (new_password, email))
 
     conn.commit()
     conn.close()
@@ -180,7 +180,7 @@ def process_video_job(job_id, video_path, job_role, username, email_address):
             conn = connect_db()
             cur = conn.cursor()
             cur.execute(
-                "INSERT INTO interview_results (username, job_role, score, feedback, transcript) VALUES (%s, %s, %s, %s, %s)",
+                f"INSERT INTO interview_results (username, job_role, score, feedback, transcript) VALUES ({Q}, {Q}, {Q}, {Q}, {Q})",
                 (username, job_role, score, feedback, text)
             )
             conn.commit()
@@ -220,7 +220,7 @@ def db_update_job(job_id, status, result_dict=None):
         cur = conn.cursor()
         result_json = json.dumps(result_dict) if result_dict else None
         cur.execute(
-            "UPDATE processing_jobs SET status=%s, result_json=%s WHERE job_id=%s",
+            f"UPDATE processing_jobs SET status={Q}, result_json={Q} WHERE job_id={Q}",
             (status, result_json, job_id)
         )
         conn.commit()
@@ -247,7 +247,7 @@ def upload():
     if username:
         conn = connect_db()
         cur = conn.cursor()
-        cur.execute("SELECT email FROM users WHERE username=%s", (username,))
+        cur.execute(f"SELECT email FROM users WHERE username={Q}", (username,))
         row = cur.fetchone()
         if row: email_address = row['email']
         conn.close()
@@ -256,7 +256,7 @@ def upload():
     conn = connect_db()
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO processing_jobs (job_id, status) VALUES (%s, %s)",
+        f"INSERT INTO processing_jobs (job_id, status) VALUES ({Q}, {Q})",
         (job_id, 'processing')
     )
     conn.commit()
@@ -277,7 +277,7 @@ def upload():
 def get_job_result(job_id):
     conn = connect_db()
     cur = conn.cursor()
-    cur.execute("SELECT status, result_json FROM processing_jobs WHERE job_id=%s", (job_id,))
+    cur.execute(f"SELECT status, result_json FROM processing_jobs WHERE job_id={Q}", (job_id,))
     row = cur.fetchone()
     conn.close()
 
@@ -301,10 +301,10 @@ def get_history():
         return jsonify([])
     conn = connect_db()
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(f"""
         SELECT id, job_role, score, feedback, transcript, created_at
         FROM interview_results
-        WHERE username = %s
+        WHERE username = {Q}
         ORDER BY created_at DESC
         LIMIT 10
     """, (session['user'],))
