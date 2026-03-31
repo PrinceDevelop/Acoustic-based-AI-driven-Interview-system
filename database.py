@@ -3,21 +3,28 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from urllib.parse import urlparse
 
-# Use DATABASE_URL from Render environment, fallback to local SQLite-like behavior
+import sqlite3
+
+# Use DATABASE_URL from Render environment, fallback to local SQLite
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
+IS_PRODUCTION = bool(DATABASE_URL)
 
 def connect_db():
-    """Connect to PostgreSQL database using DATABASE_URL."""
-    if not DATABASE_URL:
-        raise Exception("DATABASE_URL environment variable is not set!")
-    
-    # Render provides postgres:// but psycopg2 needs postgresql://
-    db_url = DATABASE_URL
-    if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql://", 1)
-    
-    conn = psycopg2.connect(db_url, cursor_factory=RealDictCursor)
-    return conn
+    """Connect to PostgreSQL on Render, or SQLite locally."""
+    if IS_PRODUCTION:
+        # PostgreSQL Logic
+        db_url = DATABASE_URL
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+        return psycopg2.connect(db_url, cursor_factory=RealDictCursor)
+    else:
+        # SQLite Logic
+        conn = sqlite3.connect("users.db")
+        conn.row_factory = sqlite3.Row
+        return conn
+
+# Syntax Helper: SQLite uses ? while Postgres uses %s
+Q = "%s" if IS_PRODUCTION else "?"
 
 def create_table():
     """Create all required tables if they don't exist."""
@@ -25,19 +32,23 @@ def create_table():
         conn = connect_db()
         cur = conn.cursor()
 
-        cur.execute("""
+        # Handle SERIAL (Postgres) vs AUTOINCREMENT (SQLite)
+        id_type = "SERIAL" if IS_PRODUCTION else "INTEGER PRIMARY KEY AUTOINCREMENT"
+        id_col = "id SERIAL PRIMARY KEY" if IS_PRODUCTION else "id INTEGER PRIMARY KEY AUTOINCREMENT"
+
+        cur.execute(f"""
         CREATE TABLE IF NOT EXISTS users(
-            id SERIAL PRIMARY KEY,
+            {id_col},
             username TEXT UNIQUE,
             email TEXT UNIQUE,
             password TEXT
         )
         """)
 
-        # Interview result history — one row per interview session
-        cur.execute("""
+        # Interview result history
+        cur.execute(f"""
         CREATE TABLE IF NOT EXISTS interview_results(
-            id SERIAL PRIMARY KEY,
+            {id_col},
             username TEXT,
             job_role TEXT,
             score INTEGER,

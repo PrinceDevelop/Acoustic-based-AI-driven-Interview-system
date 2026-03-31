@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Reset Password - AI Interview System{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+    <h2>Reset Password 🔒</h2>
+    <p class="subtitle">Securely update your credentials</p>
+
+    <form action="/reset_password" method="POST">
+        <div class="form-group">
+            <input type="email" name="email" placeholder="Enter your registered Email" required>
+        </div>
+
+        <div class="form-group">
+            <input id="password" name="password" type="password" placeholder="New Password" required>
+        </div>
+
+        <label class="checkbox-group">
+            <input type="checkbox" onclick="togglePassword()"> 
+            Show Password
+        </label>
+
+        <button type="submit" class="btn">Update Password</button>
+    </form>
+
+    <div class="auth-links">
+        <p>Remembered your password? <a href="/">Back to Login</a></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function togglePassword() {
+        let pass = document.getElementById("password");
+        pass.type = pass.type === "password" ? "text" : "password";
+    }
+</script>
+{% endblock %}

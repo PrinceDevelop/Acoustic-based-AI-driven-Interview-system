@@ -1,0 +1,837 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Room - AI Interview System{% endblock %}
+
+{% block content %}
+
+<!-- ===================== STEP 0: ROLE SELECTION OVERLAY ===================== -->
+<div id="role-overlay" style="position: fixed; inset: 0; z-index: 9999;
+     background: linear-gradient(135deg, #0B1120 0%, #0f172a 60%, #0B1120 100%);
+     overflow-y: auto; display: flex; flex-direction: column; align-items: center;
+     justify-content: flex-start; padding: 50px 20px;
+     opacity: 1; transition: opacity 0.5s ease, transform 0.5s ease;">
+
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 50px; max-width: 600px;">
+        <div style="font-size: 60px; line-height: 1; margin-bottom: 18px;">🎯</div>
+        <h1 style="font-size: 40px; font-weight: 800; margin: 0 0 14px;
+                   background: linear-gradient(135deg, #ffffff, #a5b4fc, #00E8FF);
+                   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+            Choose Your Interview Role
+        </h1>
+        <p style="color: #64748b; font-size: 16px; line-height: 1.7; margin: 0;">
+            The AI will generate <strong style="color:#94a3b8;">role-specific technical questions</strong>
+            tailored to your career path. Pick the position you're preparing for.
+        </p>
+    </div>
+
+    <!-- Role Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 18px; max-width: 950px; width: 100%; margin-bottom: 50px;">
+
+        <!-- Card: Software Engineer -->
+        <div onclick="selectRole('Software Engineer','🧑‍💻','#00E8FF')"
+             style="background: rgba(0,232,255,0.04); border: 1px solid rgba(0,232,255,0.18);
+                    border-radius: 18px; padding: 30px 24px 24px; cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); position: relative; overflow: hidden;"
+             onmouseover="this.style.transform='translateY(-6px)';this.style.borderColor='rgba(0,232,255,0.55)';this.style.boxShadow='0 20px 45px rgba(0,232,255,0.15)';"
+             onmouseout="this.style.transform='';this.style.borderColor='rgba(0,232,255,0.18)';this.style.boxShadow='';">
+            <div style="font-size: 46px; margin-bottom: 14px;">🧑‍💻</div>
+            <h3 style="margin: 0 0 6px; font-size: 19px; color: #f1f5f9; font-weight: 700;">Software Engineer</h3>
+            <p style="margin: 0 0 18px; color: #64748b; font-size: 13px; line-height: 1.5;">DSA, OOP, System Design, Algorithms</p>
+            <span style="background: rgba(0,232,255,0.12); color: #00E8FF; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">20 Questions</span>
+        </div>
+
+        <!-- Card: ML Engineer -->
+        <div onclick="selectRole('ML Engineer','🤖','#5D3FD3')"
+             style="background: rgba(93,63,211,0.05); border: 1px solid rgba(93,63,211,0.2);
+                    border-radius: 18px; padding: 30px 24px 24px; cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); position: relative; overflow: hidden;"
+             onmouseover="this.style.transform='translateY(-6px)';this.style.borderColor='rgba(93,63,211,0.6)';this.style.boxShadow='0 20px 45px rgba(93,63,211,0.2)';"
+             onmouseout="this.style.transform='';this.style.borderColor='rgba(93,63,211,0.2)';this.style.boxShadow='';">
+            <div style="font-size: 46px; margin-bottom: 14px;">🤖</div>
+            <h3 style="margin: 0 0 6px; font-size: 19px; color: #f1f5f9; font-weight: 700;">ML Engineer</h3>
+            <p style="margin: 0 0 18px; color: #64748b; font-size: 13px; line-height: 1.5;">Machine Learning, Deep Learning, Neural Nets</p>
+            <span style="background: rgba(93,63,211,0.2); color: #a78bfa; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">20 Questions</span>
+        </div>
+
+        <!-- Card: Data Scientist -->
+        <div onclick="selectRole('Data Scientist','📊','#22c55e')"
+             style="background: rgba(34,197,94,0.04); border: 1px solid rgba(34,197,94,0.18);
+                    border-radius: 18px; padding: 30px 24px 24px; cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); position: relative; overflow: hidden;"
+             onmouseover="this.style.transform='translateY(-6px)';this.style.borderColor='rgba(34,197,94,0.55)';this.style.boxShadow='0 20px 45px rgba(34,197,94,0.15)';"
+             onmouseout="this.style.transform='';this.style.borderColor='rgba(34,197,94,0.18)';this.style.boxShadow='';">
+            <div style="font-size: 46px; margin-bottom: 14px;">📊</div>
+            <h3 style="margin: 0 0 6px; font-size: 19px; color: #f1f5f9; font-weight: 700;">Data Scientist</h3>
+            <p style="margin: 0 0 18px; color: #64748b; font-size: 13px; line-height: 1.5;">Statistics, Python, Data Analysis, EDA</p>
+            <span style="background: rgba(34,197,94,0.12); color: #22c55e; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">20 Questions</span>
+        </div>
+
+        <!-- Card: Web Developer -->
+        <div onclick="selectRole('Web Developer','🌐','#f59e0b')"
+             style="background: rgba(245,158,11,0.04); border: 1px solid rgba(245,158,11,0.18);
+                    border-radius: 18px; padding: 30px 24px 24px; cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); position: relative; overflow: hidden;"
+             onmouseover="this.style.transform='translateY(-6px)';this.style.borderColor='rgba(245,158,11,0.55)';this.style.boxShadow='0 20px 45px rgba(245,158,11,0.15)';"
+             onmouseout="this.style.transform='';this.style.borderColor='rgba(245,158,11,0.18)';this.style.boxShadow='';">
+            <div style="font-size: 46px; margin-bottom: 14px;">🌐</div>
+            <h3 style="margin: 0 0 6px; font-size: 19px; color: #f1f5f9; font-weight: 700;">Web Developer</h3>
+            <p style="margin: 0 0 18px; color: #64748b; font-size: 13px; line-height: 1.5;">HTML, CSS, JavaScript, React, Frontend</p>
+            <span style="background: rgba(245,158,11,0.12); color: #f59e0b; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">20 Questions</span>
+        </div>
+
+        <!-- Card: Backend Developer -->
+        <div onclick="selectRole('Backend Developer','⚙️','#ef4444')"
+             style="background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.18);
+                    border-radius: 18px; padding: 30px 24px 24px; cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); position: relative; overflow: hidden;"
+             onmouseover="this.style.transform='translateY(-6px)';this.style.borderColor='rgba(239,68,68,0.55)';this.style.boxShadow='0 20px 45px rgba(239,68,68,0.15)';"
+             onmouseout="this.style.transform='';this.style.borderColor='rgba(239,68,68,0.18)';this.style.boxShadow='';">
+            <div style="font-size: 46px; margin-bottom: 14px;">⚙️</div>
+            <h3 style="margin: 0 0 6px; font-size: 19px; color: #f1f5f9; font-weight: 700;">Backend Developer</h3>
+            <p style="margin: 0 0 18px; color: #64748b; font-size: 13px; line-height: 1.5;">APIs, Node.js, Databases, Cloud, Scaling</p>
+            <span style="background: rgba(239,68,68,0.12); color: #ef4444; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">20 Questions</span>
+        </div>
+
+        <!-- Card: Database Admin -->
+        <div onclick="selectRole('Database Admin','🗄️','#a78bfa')"
+             style="background: rgba(167,139,250,0.04); border: 1px solid rgba(167,139,250,0.18);
+                    border-radius: 18px; padding: 30px 24px 24px; cursor: pointer;
+                    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); position: relative; overflow: hidden;"
+             onmouseover="this.style.transform='translateY(-6px)';this.style.borderColor='rgba(167,139,250,0.55)';this.style.boxShadow='0 20px 45px rgba(167,139,250,0.15)';"
+             onmouseout="this.style.transform='';this.style.borderColor='rgba(167,139,250,0.18)';this.style.boxShadow='';">
+            <div style="font-size: 46px; margin-bottom: 14px;">🗄️</div>
+            <h3 style="margin: 0 0 6px; font-size: 19px; color: #f1f5f9; font-weight: 700;">Database Admin</h3>
+            <p style="margin: 0 0 18px; color: #64748b; font-size: 13px; line-height: 1.5;">SQL, NoSQL, Indexing, Performance Tuning</p>
+            <span style="background: rgba(167,139,250,0.12); color: #a78bfa; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">20 Questions</span>
+        </div>
+
+    </div>
+
+    <p style="color: #334155; font-size: 13px; margin: 0;">
+        🤖 AI Interview System &nbsp;|&nbsp; Questions are randomly selected from a curated pool per role
+    </p>
+</div>
+<!-- ===================== END ROLE OVERLAY ===================== -->
+
+
+<!-- ===================== STEP 1 + 2: INTERVIEW + RESULTS UI ===================== -->
+<div id="interview-ui" style="display: none; max-width: 1200px; padding-bottom: 60px; margin: 0 auto; padding-top: 20px; opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease; transform: translateY(20px);">
+
+    <!-- Header -->
+    <div class="dashboard-wrapper" style="padding: 0 20px; text-align: center; margin-bottom: 30px;">
+        <h1>AI Interview Room</h1>
+        <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 6px 20px;">
+            <span id="role-emoji" style="font-size: 20px;">🎯</span>
+            <span id="role-label" style="color: #94a3b8; font-size: 15px; font-weight: 600;">Loading role...</span>
+            <span style="color: #475569;">|</span>
+            <a href="/interview" style="color: #5D3FD3; font-size: 13px; text-decoration: none; font-weight: 600;">Change Role ↩</a>
+        </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div style="display: flex; flex-wrap: wrap; gap: 30px; padding: 0 20px;">
+
+        <!-- LEFT: Camera / Upload -->
+        <div style="flex: 1; min-width: 340px;">
+
+            <!-- Mode Toggle -->
+            <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 25px;">
+                <button id="btn-live" class="btn" onclick="toggleMode('live')"
+                    style="background: rgba(0,232,255,0.2); border: 1px solid var(--primary); flex: 1; max-width: 190px;">
+                    🎥 Live Record</button>
+                <button id="btn-upload" class="btn" onclick="toggleMode('upload')"
+                    style="background: rgba(255,255,255,0.08); flex: 1; max-width: 190px; box-shadow: none;">
+                    📁 Upload File</button>
+            </div>
+
+            <!-- LIVE MODE -->
+            <div id="mode-live" class="glass-card" style="padding: 28px; display: block;">
+                <h2 style="margin-top:0;">Live Recording</h2>
+                <p class="subtitle" style="font-size: 14px; margin-bottom: 18px;">Turn on your camera and speak your answers in real-time.</p>
+
+                <div style="margin-bottom: 18px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative;">
+                    <video id="webcam-preview" autoplay muted
+                        style="width: 100%; height: 300px; background: #0a0a0a; object-fit: cover; border-radius: 12px; display: block;"></video>
+                    <!-- Recording indicator -->
+                    <div id="rec-indicator" style="display:none; position:absolute; top:14px; left:14px; background:rgba(239,68,68,0.9); color:white; padding:4px 12px; border-radius:20px; font-size:13px; font-weight:700; animation: pulse 1.5s infinite;">
+                        ● REC
+                    </div>
+                </div>
+
+                <div id="timer-display" style="text-align: center; font-size: 30px; font-weight: 800; color: var(--primary); margin-bottom: 14px; display: none; letter-spacing: 2px;">⏱️ 01:00</div>
+
+                <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 14px;">
+                    <button id="start-btn" class="btn"
+                        style="background: linear-gradient(45deg, #22c55e, #16a34a); box-shadow: 0 5px 20px rgba(34,197,94,0.35); flex: 1;"
+                        onclick="startRecording()">🟢 Start Interview</button>
+                    <button id="stop-btn" class="btn"
+                        style="background: linear-gradient(45deg, #00E8FF, #5D3FD3); display: none; flex: 1;"
+                        onclick="stopRecording()" disabled>📤 Submit</button>
+                </div>
+
+                <p id="recording-status"
+                    style="color: var(--text-muted); font-size: 14px; font-weight: 600; text-align: center; min-height: 22px; transition: color 0.3s;"></p>
+            </div>
+
+            <!-- UPLOAD MODE -->
+            <div id="mode-upload" class="glass-card" style="padding: 28px; display: none;">
+                <h2 style="margin-top:0;">Upload Video Response</h2>
+                <p class="subtitle" style="font-size: 14px; margin-bottom: 18px;">Upload a .webm or .mp4 recording of your answer.</p>
+
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div style="border: 2px dashed rgba(0,232,255,0.3); border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 18px; transition: border-color 0.3s;"
+                         onmouseover="this.style.borderColor='rgba(0,232,255,0.6)'" onmouseout="this.style.borderColor='rgba(0,232,255,0.3)'">
+                        <div style="font-size: 36px; margin-bottom: 10px;">📁</div>
+                        <input type="file" name="video" accept="video/webm, video/mp4" required style="cursor: pointer; width: 100%; color: #94a3b8;">
+                    </div>
+                    <button type="submit" id="upload-submit-btn" class="btn"
+                        style="background: linear-gradient(45deg, #00E8FF, #5D3FD3); color: white; width: 100%; padding: 14px; font-size: 16px;">
+                        🚀 Analyze My Upload
+                    </button>
+                </form>
+                <p id="upload-status" style="text-align: center; margin-top: 14px; font-size: 14px; min-height: 20px; font-weight: 600;"></p>
+            </div>
+        </div>
+
+        <!-- RIGHT: Question Card + Results -->
+        <div style="flex: 1; min-width: 340px; display: flex; flex-direction: column; gap: 24px;">
+
+            <!-- Question Panel -->
+            <div class="dash-card"
+                style="border-color: rgba(93,63,211,0.4); max-width: none; padding: 32px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: var(--primary); margin: 0; font-size: 22px;">🤖 Current Question</h2>
+                    <span id="question-counter"
+                        style="color: var(--text-muted); font-weight: 600; font-size: 14px;
+                               background: rgba(255,255,255,0.05); padding: 5px 14px; border-radius: 20px;">Q 1 / 1</span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div style="background: rgba(255,255,255,0.06); border-radius: 4px; height: 4px; margin-bottom: 22px; overflow: hidden;">
+                    <div id="progress-bar" style="height: 100%; background: linear-gradient(90deg, #5D3FD3, #00E8FF); width: 0%; transition: width 0.5s ease; border-radius: 4px;"></div>
+                </div>
+
+                <div style="min-height: 140px; display: flex; align-items: center;
+                            border-left: 4px solid var(--primary); padding-left: 20px;
+                            background: rgba(0,0,0,0.2); border-radius: 0 12px 12px 0; margin-bottom: 24px;">
+                    <p id="question-text"
+                        style="font-size: 20px; color: var(--text-main); font-style: italic;
+                               font-weight: 500; line-height: 1.65; margin: 0;">
+                        "Loading your interview question..."</p>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <button onclick="speakQuestion()" title="Listen to question"
+                        style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+                               border-radius: 10px; font-size: 22px; cursor: pointer; padding: 8px 14px;
+                               transition: all 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''">🔊</button>
+                    <button id="next-btn" onclick="nextQuestion()" class="btn"
+                        style="padding: 11px 22px; font-size: 15px; background: rgba(0,232,255,0.08);
+                               color: #00E8FF; border: 1px solid #00E8FF; box-shadow: 0 4px 12px rgba(0,232,255,0.15);">
+                        Next Question ➡️</button>
+                </div>
+            </div>
+
+            <!-- Results Card (appears after analysis) -->
+            <div id="result-box" class="glass-card"
+                style="padding: 30px; display: none; text-align: left; line-height: 1.6;
+                       border-color: rgba(93,63,211,0.3); animation: fadeSlideIn 0.6s ease;">
+                <h2 style="color: var(--primary); margin-top: 0; font-size: 22px;">📊 Analysis Results</h2>
+                <div id="result-content" style="margin-top: 10px; font-size: 15px;"></div>
+                <div style="margin-top: 24px; text-align: center;">
+                    <a href="/dashboard" class="btn"
+                       style="background: linear-gradient(45deg, #5D3FD3, #00E8FF); padding: 12px 28px; font-size: 15px; display: inline-block;">
+                        View Full History 📋
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.5; }
+}
+</style>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+// ============================
+// ROLE DATA — Question Pools
+// ============================
+const ROLE_DATA = {
+    'Software Engineer': {
+        emoji: '🧑‍💻', color: '#00E8FF',
+        questions: [
+            'What is the time and space complexity of merge sort?',
+            'Explain the difference between a stack and a queue with real-world examples.',
+            'What are the four pillars of Object-Oriented Programming?',
+            'Explain the SOLID principles in software engineering.',
+            'What is the difference between an abstract class and an interface?',
+            'What is the difference between TCP and UDP protocols?',
+            'How does garbage collection work in Python or Java?',
+            'What is a RESTful API and how does it differ from GraphQL?',
+            'Explain the concept of multithreading and how to prevent deadlocks.',
+            'What is a design pattern? Explain the Singleton and Factory patterns.',
+            'How would you design a URL shortening service like bit.ly?',
+            'What is the difference between a process and a thread?',
+            'Explain Big O notation with examples of O(1), O(log n), O(n), O(n²).',
+            'What is a Binary Search Tree and what are its advantages?',
+            'What is dynamic programming? Explain with the Fibonacci example.',
+            'What is the difference between synchronous and asynchronous programming?',
+            'Explain the concept of microservices architecture and its trade-offs.',
+            'What is a hash table and how does it handle collisions?',
+            'What is the difference between shallow copy and deep copy?',
+            'Explain the CAP theorem in distributed systems.'
+        ]
+    },
+    'ML Engineer': {
+        emoji: '🤖', color: '#5D3FD3',
+        questions: [
+            'What is the difference between supervised, unsupervised, and reinforcement learning?',
+            'Explain the bias-variance tradeoff in machine learning.',
+            'What is overfitting, and how do you prevent it?',
+            'What are Convolutional Neural Networks and what are their primary use cases?',
+            'Explain the concept of backpropagation in neural networks.',
+            'What is the vanishing gradient problem and how can it be mitigated?',
+            'Explain the difference between a generative and a discriminative model.',
+            'What is cross-validation and why is it important?',
+            'Explain precision, recall, F1-score, and the ROC-AUC curve.',
+            'What is the difference between L1 and L2 regularization?',
+            'Explain gradient descent and its variants: SGD, Adam, and RMSprop.',
+            'What is transfer learning and when would you apply it?',
+            'Explain the attention mechanism and its role in Transformer models.',
+            'What is the difference between Random Forest and Gradient Boosting?',
+            'What is the curse of dimensionality?',
+            'Explain Principal Component Analysis (PCA) and when to use it.',
+            'What is a Recurrent Neural Network (RNN) and when would you prefer it over a CNN?',
+            'How do you handle imbalanced datasets in classification?',
+            'What is feature engineering and why is it critical in ML pipelines?',
+            'Explain the difference between batch normalization and layer normalization.'
+        ]
+    },
+    'Data Scientist': {
+        emoji: '📊', color: '#22c55e',
+        questions: [
+            'What is the difference between correlation and causation?',
+            'Explain the Central Limit Theorem and its significance in data science.',
+            'What is hypothesis testing? Explain Type I and Type II errors.',
+            'What is the p-value and how do you interpret it?',
+            'Explain the difference between mean, median, and mode and when to use each.',
+            'What is Bayesian statistics and how does it differ from frequentist statistics?',
+            'Walk me through the typical steps in a data science project pipeline.',
+            'How do you handle missing data in a dataset?',
+            'What is exploratory data analysis (EDA) and what tools do you use?',
+            'Explain the concept of A/B testing and how you set it up.',
+            'What is the difference between ANOVA and a t-test?',
+            'How would you detect and handle outliers in a dataset?',
+            'What is the difference between data normalization and standardization?',
+            'Explain the chi-square test and when you would use it.',
+            'How do you communicate data insights to non-technical stakeholders?',
+            'What is the difference between OLAP and OLTP systems?',
+            'What are the main methods for feature selection?',
+            'How do you evaluate the quality of a clustering algorithm?',
+            'What is Simpson\'s Paradox and can you give an example?',
+            'What is the difference between a data scientist and a data analyst?'
+        ]
+    },
+    'Web Developer': {
+        emoji: '🌐', color: '#f59e0b',
+        questions: [
+            'Explain the CSS box model and how it affects layout.',
+            'What is the difference between display: block, inline, and inline-block?',
+            'How does Flexbox work? When would you use Grid instead?',
+            'What is the difference between == and === in JavaScript?',
+            'Explain event bubbling and event capturing in the DOM.',
+            'What is a closure in JavaScript? Give a practical example.',
+            'What is the difference between let, const, and var?',
+            'Explain the concept of Promises and async/await.',
+            'What is the Virtual DOM in React and why does it improve performance?',
+            'Explain the React component lifecycle and its main phases.',
+            'What are React hooks? Explain useState, useEffect, and useContext.',
+            'What is the difference between props and state in React?',
+            'How do you implement responsive web design?',
+            'What is CORS and how do you handle it on the frontend?',
+            'What is the difference between localStorage, sessionStorage, and cookies?',
+            'What is webpack and what problem does it solve?',
+            'Explain the concept of code splitting and lazy loading.',
+            'What is the difference between SSR (Server-Side Rendering) and CSR?',
+            'What are Web Accessibility best practices (WCAG)?',
+            'What is a Progressive Web App (PWA)?'
+        ]
+    },
+    'Backend Developer': {
+        emoji: '⚙️', color: '#ef4444',
+        questions: [
+            'What is the difference between REST, GraphQL, and gRPC?',
+            'Explain stateless vs stateful applications with examples.',
+            'What is middleware and how is it used in backend frameworks?',
+            'What is the difference between authentication and authorization?',
+            'What is JWT? How does it work and what are its limitations?',
+            'Explain different caching strategies and when to use each.',
+            'What is the difference between horizontal and vertical scaling?',
+            'What is a message queue and name popular ones (RabbitMQ, Kafka)?',
+            'Explain rate limiting and how you would implement it.',
+            'What is Docker and why is containerization important?',
+            'Explain the concept of load balancing and its algorithms.',
+            'What is CI/CD and how does it improve software delivery?',
+            'What is the difference between SQL and NoSQL databases?',
+            'Explain the CAP theorem in distributed systems.',
+            'What is an API Gateway and what are its benefits?',
+            'What is serverless architecture and when would you choose it?',
+            'Explain the concept of webhook vs polling.',
+            'How would you secure a REST API?',
+            'What is database connection pooling and why is it important?',
+            'How would you handle database transactions to ensure data integrity?'
+        ]
+    },
+    'Database Admin': {
+        emoji: '🗄️', color: '#a78bfa',
+        questions: [
+            'What is the difference between a clustered and a non-clustered index?',
+            'Explain database normalization forms (1NF, 2NF, 3NF, BCNF).',
+            'What are ACID properties and why are they critical?',
+            'What is the difference between SQL and NoSQL databases?',
+            'How would you optimize a slow-running SQL query?',
+            'Explain the concept of database sharding.',
+            'What is database replication? Explain master-slave replication.',
+            'What is the difference between a view and a stored procedure?',
+            'Explain deadlock in databases and how to prevent it.',
+            'What is database partitioning and how does it improve performance?',
+            'Explain the difference between INNER JOIN, LEFT JOIN, RIGHT JOIN, and FULL OUTER JOIN.',
+            'What is database denormalization and when would you use it?',
+            'What is the difference between optimistic and pessimistic locking?',
+            'What is an ORM and what are its advantages and disadvantages?',
+            'Explain database backup strategies and point-in-time recovery.',
+            'What is a database trigger and when would you use it?',
+            'What is the difference between a database and a data warehouse?',
+            'Explain the concept of eventual consistency in distributed databases.',
+            'What is a query execution plan and how do you use it?',
+            'Explain the difference between a database index and a full-table scan.'
+        ]
+    }
+};
+
+// Intro questions always start the interview
+const INTRO_QUESTIONS = [
+    'Please introduce yourself and walk me through your academic and professional background.',
+    'Why did you choose this field, and what are you most passionate about in your career?'
+];
+
+// ============================
+// STATE VARIABLES
+// ============================
+let selectedRole = 'Software Engineer';
+let selectedEmoji = '🧑‍💻';
+let selectedColor = '#00E8FF';
+let stream = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+let timerInterval = null;
+let timeLeft = 60;
+let isInterviewActive = false;
+let currentQuestionIndex = 0;
+let selectedQuestions = [];
+let currentQuestion = '';
+
+// ============================
+// ROLE SELECTION
+// ============================
+function selectRole(role, emoji, color) {
+    selectedRole = role;
+    selectedEmoji = emoji;
+    selectedColor = color;
+
+    // Fade out overlay
+    const overlay = document.getElementById('role-overlay');
+    overlay.style.opacity = '0';
+    overlay.style.transform = 'scale(1.04)';
+    overlay.style.pointerEvents = 'none';
+
+    setTimeout(() => {
+        overlay.style.display = 'none';
+
+        // Show & animate in interview UI
+        const ui = document.getElementById('interview-ui');
+        ui.style.display = 'block';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                ui.style.opacity = '1';
+                ui.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Update role badge
+        document.getElementById('role-emoji').textContent = emoji;
+        document.getElementById('role-label').textContent = role;
+
+        // Boot webcam + questions
+        setupWebcam();
+        initializeQuestions();
+    }, 500);
+}
+
+// ============================
+// MODE TOGGLE
+// ============================
+function toggleMode(mode) {
+    const isLive = mode === 'live';
+    document.getElementById('mode-live').style.display = isLive ? 'block' : 'none';
+    document.getElementById('mode-upload').style.display = isLive ? 'none' : 'block';
+
+    const liveBtn = document.getElementById('btn-live');
+    const uploadBtn = document.getElementById('btn-upload');
+
+    if (isLive) {
+        liveBtn.style.cssText += '; background: rgba(0,232,255,0.2); border: 1px solid var(--primary); box-shadow: 0 5px 15px rgba(0,232,255,0.25);';
+        uploadBtn.style.cssText += '; background: rgba(255,255,255,0.08); border: none; box-shadow: none;';
+        setupWebcam();
+    } else {
+        uploadBtn.style.cssText += '; background: rgba(0,232,255,0.2); border: 1px solid var(--primary); box-shadow: 0 5px 15px rgba(0,232,255,0.25);';
+        liveBtn.style.cssText += '; background: rgba(255,255,255,0.08); border: none; box-shadow: none;';
+        stopWebcamPreview();
+    }
+}
+
+// ============================
+// WEBCAM
+// ============================
+async function setupWebcam() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        document.getElementById('webcam-preview').srcObject = stream;
+    } catch (err) {
+        document.getElementById('recording-status').textContent = '⚠️ Allow Camera & Microphone access to use Live Record.';
+    }
+}
+
+function stopWebcamPreview() {
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        document.getElementById('webcam-preview').srcObject = null;
+    }
+}
+
+// ============================
+// TIMER
+// ============================
+function startTimer() {
+    timeLeft = 60;
+    const display = document.getElementById('timer-display');
+    display.style.display = 'block';
+    updateTimerDisplay();
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) nextQuestion();
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+    const s = (timeLeft % 60).toString().padStart(2, '0');
+    document.getElementById('timer-display').textContent = '⏱️ ' + m + ':' + s;
+    document.getElementById('timer-display').style.color = timeLeft <= 10 ? '#ef4444' : 'var(--primary)';
+}
+
+// ============================
+// RECORDING
+// ============================
+function startRecording() {
+    if (!stream) { alert('Camera not ready. Please allow permissions and refresh.'); return; }
+    if (currentQuestionIndex >= selectedQuestions.length) { alert('All questions completed!'); return; }
+
+    recordedChunks = [];
+    try {
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp8,opus' });
+    } catch(e) {
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    }
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = uploadRecording;
+    mediaRecorder.start(1000);
+    isInterviewActive = true;
+    startTimer();
+
+    document.getElementById('start-btn').style.display = 'none';
+    document.getElementById('rec-indicator').style.display = 'block';
+    document.getElementById('recording-status').textContent = '🔴 Recording in progress... answer each question.';
+    document.getElementById('recording-status').style.color = '#ef4444';
+}
+
+function stopRecording() {
+    clearInterval(timerInterval);
+    document.getElementById('timer-display').style.display = 'none';
+    document.getElementById('rec-indicator').style.display = 'none';
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    document.getElementById('stop-btn').disabled = true;
+    document.getElementById('recording-status').textContent = '⏳ Processing through AI... please wait.';
+    document.getElementById('recording-status').style.color = '#94a3b8';
+}
+
+// ============================
+// RESULT RENDERER
+// ============================
+function renderResults(data) {
+    const { score, feedback, transcript, job_role, email_sent, email_address } = data;
+    const scoreColor = score >= 70 ? '#22c55e' : (score >= 40 ? '#f59e0b' : '#ef4444');
+    const scoreLabel = score >= 70 ? 'Excellent' : (score >= 40 ? 'Average' : 'Needs Improvement');
+    const scoreEmoji = score >= 70 ? '🌟' : (score >= 40 ? '👍' : '📈');
+
+    let emailHTML = '';
+    if (email_sent) {
+        emailHTML = '<div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.4);border-radius:10px;padding:11px 16px;margin-bottom:20px;font-size:14px;color:#22c55e;font-weight:600;">✅ Full results emailed to <strong>' + email_address + '</strong></div>';
+    } else if (email_address) {
+        emailHTML = '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;font-size:14px;color:#f59e0b;">⚠️ Email could not be sent. Check SMTP credentials.</div>';
+    }
+
+    const feedbackLines = feedback.split('\n').filter(l => l.trim())
+        .map(line => '<li style="padding:5px 0;color:#cbd5e1;font-size:14px;">' + line + '</li>').join('');
+
+    document.getElementById('result-content').innerHTML =
+        emailHTML +
+        // Score Ring
+        '<div style="text-align:center;margin-bottom:24px;">' +
+        '  <div style="display:inline-flex;align-items:center;justify-content:center;' +
+        '       background:rgba(255,255,255,0.04);border:3px solid ' + scoreColor + ';border-radius:50%;' +
+        '       width:110px;height:110px;font-size:34px;font-weight:900;color:' + scoreColor + ';' +
+        '       box-shadow:0 0 35px ' + scoreColor + '44;margin-bottom:12px;">' + score + '</div>' +
+        '  <p style="margin:0;font-size:13px;"><span style="background:' + scoreColor + '1a;color:' + scoreColor + ';' +
+        '     padding:4px 18px;border-radius:20px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">' + scoreEmoji + ' ' + scoreLabel + '</span></p>' +
+        '  <p style="margin:8px 0 0;color:#64748b;font-size:13px;">Role: ' + (job_role || selectedRole) + '</p>' +
+        '</div>' +
+        // Transcript
+        '<div style="background:rgba(0,0,0,0.3);border-left:4px solid ' + selectedColor + ';border-radius:0 10px 10px 0;padding:14px 18px;margin-bottom:16px;">' +
+        '  <p style="margin:0 0 5px;font-size:11px;color:' + selectedColor + ';font-weight:700;text-transform:uppercase;letter-spacing:1px;">📝 Speech Transcript</p>' +
+        '  <p style="margin:0;color:#94a3b8;font-size:13px;line-height:1.65;">' + (transcript || 'No transcript available.') + '</p>' +
+        '</div>' +
+        // AI Feedback
+        '<div style="background:rgba(0,0,0,0.25);border-left:4px solid var(--primary);border-radius:0 10px 10px 0;padding:14px 18px;">' +
+        '  <p style="margin:0 0 10px;font-size:11px;color:var(--primary);font-weight:700;text-transform:uppercase;letter-spacing:1px;">🎯 AI Performance Feedback</p>' +
+        '  <ul style="margin:0;padding-left:16px;list-style:disc;">' + feedbackLines + '</ul>' +
+        '</div>';
+
+    const box = document.getElementById('result-box');
+    box.style.display = 'block';
+    setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+}
+
+// ============================
+// POLLING HELPER
+// ============================
+async function pollResult(job_id, onDone, onError, statusEl) {
+    const startTime = Date.now();
+    const interval = setInterval(async () => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const dots = '.'.repeat((elapsed % 3) + 1);
+        if (statusEl) statusEl.textContent = `⏳ AI analyzing your voice${dots} (${elapsed}s)`;
+        try {
+            const res = await fetch('/result/' + job_id);
+            const data = await res.json();
+            if (data.status === 'done') {
+                clearInterval(interval);
+                onDone(data.result);
+            } else if (data.status === 'error') {
+                clearInterval(interval);
+                onError(data.result && data.result.error ? data.result.error : 'Processing failed.');
+            }
+            // else still 'processing' — keep polling
+        } catch (e) {
+            clearInterval(interval);
+            onError('Connection lost while polling for results.');
+        }
+    }, 2000);
+}
+
+// ============================
+// UPLOAD — LIVE RECORDING
+// ============================
+async function uploadRecording() {
+    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+    const formData = new FormData();
+    formData.append('video', blob, 'live_interview.webm');
+    formData.append('job_role', selectedRole);
+
+    const statusEl = document.getElementById('recording-status');
+
+    try {
+        const res = await fetch('/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.error) {
+            statusEl.textContent = '❌ Error: ' + data.error;
+            statusEl.style.color = '#ef4444';
+            return;
+        }
+
+        statusEl.textContent = '⏳ Analyzing... (AI is processing your voice)';
+        statusEl.style.color = '#94a3b8';
+
+        pollResult(
+            data.job_id,
+            (result) => {
+                statusEl.textContent = '✅ Analysis complete! See your results below.';
+                statusEl.style.color = '#22c55e';
+                renderResults(result);
+            },
+            (errMsg) => {
+                statusEl.textContent = '❌ Error: ' + errMsg;
+                statusEl.style.color = '#ef4444';
+            },
+            statusEl
+        );
+    } catch (err) {
+        statusEl.textContent = '❌ Upload failed. Please try again.';
+        statusEl.style.color = '#ef4444';
+    }
+}
+
+// ============================
+// UPLOAD — FILE FORM (AJAX)
+// ============================
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('upload-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('upload-submit-btn');
+        const statusEl = document.getElementById('upload-status');
+
+        btn.disabled = true;
+        btn.textContent = '⏳ Uploading...';
+        statusEl.style.color = '#94a3b8';
+        statusEl.textContent = 'Uploading video...';
+
+        const fd = new FormData(e.target);
+        fd.append('job_role', selectedRole);
+
+        try {
+            const res = await fetch('/upload', { method: 'POST', body: fd });
+            const data = await res.json();
+
+            if (data.error) {
+                btn.disabled = false;
+                btn.textContent = '🚀 Analyze My Upload';
+                statusEl.style.color = '#ef4444';
+                statusEl.textContent = '❌ ' + data.error;
+                return;
+            }
+
+            btn.textContent = '⏳ Processing...';
+            statusEl.style.color = '#94a3b8';
+            statusEl.textContent = '⏳ Analyzing... (AI is processing your voice)';
+
+            pollResult(
+                data.job_id,
+                (result) => {
+                    btn.disabled = false;
+                    btn.textContent = '🚀 Analyze My Upload';
+                    statusEl.style.color = '#22c55e';
+                    statusEl.textContent = '✅ Done! See results on the right →';
+                    renderResults(result);
+                },
+                (errMsg) => {
+                    btn.disabled = false;
+                    btn.textContent = '🚀 Analyze My Upload';
+                    statusEl.style.color = '#ef4444';
+                    statusEl.textContent = '❌ ' + errMsg;
+                },
+                statusEl
+            );
+        } catch (err) {
+            btn.disabled = false;
+            btn.textContent = '🚀 Analyze My Upload';
+            statusEl.style.color = '#ef4444';
+            statusEl.textContent = '❌ Upload failed. Please try again.';
+        }
+    });
+});
+
+// ============================
+// QUESTION SYSTEM
+// ============================
+function initializeQuestions() {
+    const roleInfo = ROLE_DATA[selectedRole];
+    if (!roleInfo) return;
+    const shuffled = [...roleInfo.questions].sort(() => 0.5 - Math.random());
+    const count = Math.floor(Math.random() * 4) + 5; // 5–8 role questions
+    selectedQuestions = [...INTRO_QUESTIONS, ...shuffled.slice(0, count)];
+    currentQuestionIndex = 0;
+    displayCurrentQuestion();
+}
+
+function displayCurrentQuestion() {
+    if (currentQuestionIndex < selectedQuestions.length) {
+        currentQuestion = selectedQuestions[currentQuestionIndex];
+        document.getElementById('question-text').textContent = '"' + currentQuestion + '"';
+        document.getElementById('question-counter').textContent =
+            'Q ' + (currentQuestionIndex + 1) + ' / ' + selectedQuestions.length;
+
+        // Update progress bar
+        const pct = (currentQuestionIndex / selectedQuestions.length) * 100;
+        document.getElementById('progress-bar').style.width = pct + '%';
+
+        speakQuestion();
+    } else {
+        // All questions done
+        currentQuestion = 'You have completed all questions. Great job! Please click Submit to send your recording for analysis.';
+        document.getElementById('question-text').textContent = '"' + currentQuestion + '"';
+
+        const counter = document.getElementById('question-counter');
+        counter.textContent = '✅ Done';
+        counter.style.background = 'rgba(34,197,94,0.15)';
+        counter.style.color = '#22c55e';
+        document.getElementById('progress-bar').style.width = '100%';
+
+        clearInterval(timerInterval);
+        document.getElementById('timer-display').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+
+        if (isInterviewActive) {
+            document.getElementById('stop-btn').style.display = 'inline-block';
+            document.getElementById('stop-btn').disabled = false;
+            document.getElementById('recording-status').textContent = '✅ All questions done. Click Submit to analyze your interview.';
+            document.getElementById('recording-status').style.color = '#22c55e';
+        }
+        speakQuestion();
+    }
+}
+
+function nextQuestion() {
+    if (currentQuestionIndex < selectedQuestions.length) {
+        currentQuestionIndex++;
+        displayCurrentQuestion();
+        if (isInterviewActive && currentQuestionIndex < selectedQuestions.length) startTimer();
+    }
+}
+
+function speakQuestion() {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(currentQuestion);
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v => v.lang.startsWith('en') &&
+        (v.name.includes('Google') || v.name.includes('Natural') ||
+         v.name.includes('Zira') || v.name.includes('Mark')));
+    if (preferred) utt.voice = preferred;
+    utt.rate = 0.93; utt.pitch = 1.0;
+    window.speechSynthesis.speak(utt);
+}
+
+// Preload voices
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.getVoices();
+    speechSynthesis.addEventListener('voiceschanged', () => {});
+}
+</script>
+{% endblock %}
