@@ -1,0 +1,5 @@
+[phases.setup]
+aptPkgs = ["...", "ffmpeg"]
+
+[phases.build]
+cmds = ["...", "python -m textblob.download_corpora"]

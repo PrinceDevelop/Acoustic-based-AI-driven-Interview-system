@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - AI Interview System{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+    <h2>Create Account 🚀</h2>
+    <p class="subtitle">Join the future of AI interviewing</p>
+
+    <!-- Notification system -->
+    <div id="notification-area"></div>
+
+    <form action="/register" method="POST">
+        <div class="form-group">
+            <input type="text" name="username" placeholder="Choose a Username" required>
+        </div>
+
+        <div class="form-group">
+            <input type="email" name="email" placeholder="Email Address" required>
+        </div>
+
+        <div class="form-group">
+            <input id="password" name="password" type="password" placeholder="Password (Min 8 chars, 1 Cap, 1 Spl)" required>
+        </div>
+
+        <label class="checkbox-group">
+            <input type="checkbox" onclick="togglePassword()"> 
+            Show Password
+        </label>
+
+        <button type="submit" class="btn">Register Profile</button>
+    </form>
+
+    <div class="auth-links">
+        <p>Already have an account? <a href="/">Log in here</a></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const msg = params.get("msg");
+
+    if (msg) {
+        document.getElementById("notification-area").innerHTML = `<div class="notification">${msg}</div>`;
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    function togglePassword() {
+        let pass = document.getElementById("password");
+        pass.type = pass.type === "password" ? "text" : "password";
+    }
+</script>
+{% endblock %}

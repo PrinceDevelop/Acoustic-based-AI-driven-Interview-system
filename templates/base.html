@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Interview System{% endblock %}</title>
+    <!-- Premium Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Unified Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='global.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    {% if session.get('user') %}
+    <!-- 🔝 NAVBAR (Authorized) -->
+    <header class="navbar">
+        <div class="logo">AI Interview</div>
+        <nav class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/interview">Interview</a>
+            <a href="/services">Services</a>
+            <a href="/contact">Contact</a>
+            <a href="/logout">Logout</a>
+        </nav>
+    </header>
+    {% endif %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 🔻 FOOTER -->
+    <footer>
+        <p>© 2026 AI Interview System | Developed by Prince Kumar</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

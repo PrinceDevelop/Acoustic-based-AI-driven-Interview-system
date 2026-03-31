@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - AI Interview System{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+    <h2>Contact Us 📧</h2>
+    <p class="subtitle">Have questions or feedback? Drop us a line.</p>
+
+    <form action="#" method="POST" onsubmit="alert('Message sent successfully!'); return false;">
+        <div class="form-group">
+            <input type="text" name="name" placeholder="Your Name" required>
+        </div>
+
+        <div class="form-group">
+            <input type="email" name="email" placeholder="Your Email" required>
+        </div>
+
+        <div class="form-group">
+            <textarea name="message" placeholder="Your Message" required style="width: 100%; padding: 14px 16px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-glass); border-radius: 10px; color: white; font-size: 15px; outline: none; min-height: 120px; transition: all 0.3s ease; resize: none;"></textarea>
+            <style>
+                textarea:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 232, 255, 0.2); }
+                textarea::placeholder { color: var(--text-muted); font-family: 'Outfit', sans-serif;}
+            </style>
+        </div>
+
+        <button type="submit" class="btn">Send Message</button>
+    </form>
+</div>
+{% endblock %}
